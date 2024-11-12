@@ -16,15 +16,6 @@ public class UserController {
 
     private final UserService userService;
 
-    @GetMapping("/me")
-    public Response<UserDetailResponseDTO> getLoggedUserData(
-    ){
-        Response<UserDetailResponseDTO> response = new Response<>();
-        response.setOk();
-        response.setData(userService.getUserInfo());
-        return response;
-    }
-
     @PostMapping()
     public Response<UserDetailResponseDTO> createUser(
             @RequestBody @Valid CreateUserRequestDTO createUserRequestDTO

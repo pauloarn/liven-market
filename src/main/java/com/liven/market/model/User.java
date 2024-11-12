@@ -21,11 +21,11 @@ import java.util.List;
 @Table(name = "users", catalog = Catalog.MARKET_DATA_BASE, schema = Schema.MarketApp)
 public class User extends BaseEntity implements UserDetails {
     @Id
-    @SequenceGenerator(name = "fitapp.iduser_id_seq",
-            sequenceName = "fitapp.iduser_id_seq",
+    @SequenceGenerator(name = "MarketApp.iduser_id_seq",
+            sequenceName = "MarketApp.iduser_id_seq",
             allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE,
-            generator = "fitapp.iduser_id_seq")
+            generator = "MarketApp.iduser_id_seq")
     @Column(name = "id")
     private Long userId;
 

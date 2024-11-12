@@ -40,7 +40,8 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(loggerFilter, AuthFilter.class)
-                .authorizeHttpRequests(requests ->
+                .authorizeHttpRequests(
+                        requests ->
                         requests
                                 .requestMatchers("/session/**").permitAll()
                                 .requestMatchers("/user/**").permitAll()
