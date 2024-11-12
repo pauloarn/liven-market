@@ -1,0 +1,25 @@
+version: '3.7'
+
+volumes:
+  market_app_vol:
+
+networks:
+  market_net:
+    name: market_net
+
+services:
+    market_db:
+      container_name: livenMarket_db
+      image: postgres:14-alpine
+      restart: "no"
+      ports:
+       - '5432:5432'
+      environment:
+       - POSTGRES_DB=LivenMarketDataBase
+       - POSTGRES_USER=root
+       - POSTGRES_PASSWORD=root@123
+      networks:
+       - market_net
+      volumes:
+       - market_app_vol:/var/lib/postgresql/data
+

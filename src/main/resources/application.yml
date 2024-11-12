@@ -1,0 +1,75 @@
+market:
+  app:
+    name: liven-market
+    secret: ${JWT_SECRET:my-market-secret}
+  port: 8285
+  log:
+    level: DEBUG
+  database:
+    name: ${DB_NAME:LivenMarketDataBase}
+    username: ${DB_CONNECTION_USER_NAME:root}
+    password: ${DB_CONNECTION_PASSWORD:root@123}
+    host: ${DB_CONNECTION_HOST:localhost}
+    ddlAuto: validate
+    port: 5432
+    showSql: false
+    enableFlyway: ${RUN_FLYWAY:false}
+    
+spring:
+  output:
+    ansi:
+      enabled: detect
+  application:
+    name: ${market.app.name}
+  jackson:
+    serialization:
+      write-dates-as-timestamps: true
+  datasource:
+    url: jdbc:postgresql://${market.database.host}:${market.database.port}/${market.database.name}
+    username: ${market.database.username}
+    password: ${market.database.password}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    properties:
+      hibernate:
+        jdbc:
+          lob:
+            non_contextual_creation: true
+      order_by:
+        default_null_ordering: last
+    hibernate:
+      ddl-auto: ${market.database.ddlAuto}
+      naming:
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    show-sql: ${market.database.showSql}
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  flyway:
+    enabled: ${fit.database.enableFlyway}
+    schemas: fitapp
+    locations: filesystem:src/main/resources/scripts/migrations
+    user: ${fit.database.username}
+    password: ${fit.database.password}
+  web:
+    locale: pt_BR
+    resources:
+      add-mappings: false
+  mvc:
+    format:
+      date: dd/MM/yyyy
+  servlet:
+    multipart:
+      enabled: false
+
+server:
+  port: ${PORT:${market.port}}
+  servlet:
+    context-path: ${CONTEXT_PATH:/market}
+
+logging:
+  pattern:
+    console: '%d{yyyy-MM-dd HH:mm:ss.SSS} %clr(${LOG_LEVEL_PATTERN:%5p}) %clr(%-40.40logger{39}){cyan} %clr(:){faint} %clr([${market.app.name}]){magenta}%clr(%X{cdTransacao}){yellow}%clr(%X{contexto}){blue} %clr(%m%n){%5p} ${LOG_EXCEPTION_CONVERSION_WORD:%wEx}'
+    file: '%d{yyyy-MM-dd HH:mm:ss.SSS} %clr(${LOG_LEVEL_PATTERN:%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %clr([${market.app.name}]){magenta}%clr(%X{contexto}){magenta}%clr(%X{cdTransacao}){magenta} %m%n${LOG_EXCEPTION_CONVERSION_WORD:%wEx}'
+  level:
+    com.liven: ${market.log.level}
+    root: INFO
