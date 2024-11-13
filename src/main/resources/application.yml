@@ -6,14 +6,13 @@ market:
   log:
     level: DEBUG
   database:
+    schema: ${DB_SCHEMA:MarketApp}
     name: ${DB_NAME:LivenMarketDataBase}
-    username: ${DB_CONNECTION_USER_NAME:root}
-    password: ${DB_CONNECTION_PASSWORD:root@123}
-    host: ${DB_CONNECTION_HOST:localhost}
+    username: ${DB_CONNECTION_USER_NAME:sa}
+    password: ${DB_CONNECTION_PASSWORD:password}
     ddlAuto: validate
-    port: 5432
     showSql: false
-    enableFlyway: ${RUN_FLYWAY:false}
+    enableFlyway: ${RUN_FLYWAY:true}
     
 spring:
   output:
@@ -25,10 +24,12 @@ spring:
     serialization:
       write-dates-as-timestamps: true
   datasource:
-    url: jdbc:postgresql://${market.database.host}:${market.database.port}/${market.database.name}
+    url: jdbc:h2:mem:${market.database.name};MODE=PostgreSQL;AUTO_RECONNECT=TRUE;INIT=CREATE SCHEMA IF NOT EXISTS MarketApp;DB_CLOSE_DELAY=-1
     username: ${market.database.username}
     password: ${market.database.password}
-    driver-class-name: org.postgresql.Driver
+    driver-class-name: org.h2.Driver
+  h2:
+    console.enabled: true
   jpa:
     properties:
       hibernate:
@@ -43,13 +44,15 @@ spring:
         implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     show-sql: ${market.database.showSql}
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    database-platform: org.hibernate.dialect.H2Dialect
+#    defer-datasource-initialization: true
   flyway:
-    enabled: ${fit.database.enableFlyway}
-    schemas: fitapp
+    enabled: ${market.database.enableFlyway}
+    schemas: ${market.database.schema}
     locations: filesystem:src/main/resources/scripts/migrations
-    user: ${fit.database.username}
-    password: ${fit.database.password}
+    user: ${market.database.username}
+    password: ${market.database.password}
+    baseline-on-migrate: true
   web:
     locale: pt_BR
     resources:
