@@ -13,8 +13,11 @@ market:
     ddlAuto: validate
     showSql: false
     enableFlyway: ${RUN_FLYWAY:true}
-    
+
 spring:
+  devtools:
+    livereload:
+      enabled: false
   output:
     ansi:
       enabled: detect
@@ -45,7 +48,7 @@ spring:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     show-sql: ${market.database.showSql}
     database-platform: org.hibernate.dialect.H2Dialect
-#    defer-datasource-initialization: true
+  #    defer-datasource-initialization: true
   flyway:
     enabled: ${market.database.enableFlyway}
     schemas: ${market.database.schema}
@@ -63,6 +66,10 @@ spring:
   servlet:
     multipart:
       enabled: false
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
 
 server:
   port: ${PORT:${market.port}}
