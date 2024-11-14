@@ -40,11 +40,7 @@ public class UserService extends AbstractServiceRepo<UserRepository, User, Long>
     }
 
     public UserDetailResponseDTO createUser(CreateUserRequestDTO createUserRequest) throws ApiErrorException {
-        log.info("Verifying if email is already registered");
-        Optional<User> userAux = repository.findUsersByEmail(createUserRequest.getEmail());
-        if(userAux.isPresent()){
-            throw new ApiErrorException(HttpStatus.BAD_REQUEST, MessageEnum.USER_ALREADY_EXISTS);
-        }
+        validateCreateUserRequest(createUserRequest);
         log.info("Creating new user");
         String encryptedPass = new BCryptPasswordEncoder().encode(createUserRequest.getPassword());
         User newUser = new User();
@@ -54,5 +50,13 @@ public class UserService extends AbstractServiceRepo<UserRepository, User, Long>
         repository.save(newUser);
         log.info("User created");
         return new UserDetailResponseDTO(newUser);
+    }
+
+    private void validateCreateUserRequest(CreateUserRequestDTO createUserRequest) throws ApiErrorException {
+        log.info("Verifying if email is already registered");
+        Optional<User> userAux = repository.findUsersByEmail(createUserRequest.getEmail());
+        if(userAux.isPresent()){
+            throw new ApiErrorException(HttpStatus.BAD_REQUEST, MessageEnum.USER_ALREADY_EXISTS);
+        }
     }
 }

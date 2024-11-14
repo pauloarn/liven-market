@@ -47,5 +47,4 @@ build/
 .DS_Store
 
 .idea
-fit_app_kp.pem
 *.pem
