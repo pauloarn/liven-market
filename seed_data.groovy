@@ -1,4 +1,6 @@
 import groovy.transform.Field
+import groovy.json.JsonSlurper
+
 
 @Field String baseUrl = 'http://localhost:8285/market'
 @Field String userEmail = 'admin@admin.com'
