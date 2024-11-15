@@ -16,7 +16,9 @@ public enum MessageEnum {
     SKU_ALREADY_REGISTERED("message.api.sku.already.registered"),
     AMOUNT_MUST_NOT_BE_NEGATIVE("message.api.amount.must.not.be.negative"),
     PRICE_MUST_BE_GREATER_THAN_0("message.api.price.must.be.greater.than.0"),
+    PRODUCT_ON_STOCK_LESS_THAN_REQUIRED("message.api.product.on.stock.less.than.required"),
     PRODUCT_NOT_REGISTERED("message.api.product.not.registered"),
+    BASKET_NOT_FOUND("message.api.basket.not.found"),
     UNKNOWN_ERROR("message.api.error.desconhecido"),
 
     INVALID_TOKEN("message.api.invalid.token"),
