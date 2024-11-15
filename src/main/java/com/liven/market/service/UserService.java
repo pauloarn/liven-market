@@ -14,15 +14,16 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Log4j2
-public class UserService extends AbstractServiceRepo<UserRepository, User, Long> {
+public class UserService extends AbstractServiceRepo<UserRepository, User, UUID> {
     public UserService(UserRepository repository) {
         super(repository);
     }
 
-    public UserDetailResponseDTO getUserInfo () {
+    public UserDetailResponseDTO getUserInfo() {
         User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         return new UserDetailResponseDTO(loggedUser);
@@ -33,7 +34,7 @@ public class UserService extends AbstractServiceRepo<UserRepository, User, Long>
         return repository.findUsersByEmail(userEmail).orElseThrow(() -> new ApiErrorException(HttpStatus.BAD_REQUEST, MessageEnum.USER_NOT_FOUND));
     }
 
-    public User getLoggedUser(){
+    public User getLoggedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         return (User) authentication.getPrincipal();
@@ -55,7 +56,7 @@ public class UserService extends AbstractServiceRepo<UserRepository, User, Long>
     private void validateCreateUserRequest(CreateUserRequestDTO createUserRequest) throws ApiErrorException {
         log.info("Verifying if email is already registered");
         Optional<User> userAux = repository.findUsersByEmail(createUserRequest.getEmail());
-        if(userAux.isPresent()){
+        if (userAux.isPresent()) {
             throw new ApiErrorException(HttpStatus.BAD_REQUEST, MessageEnum.USER_ALREADY_EXISTS);
         }
     }

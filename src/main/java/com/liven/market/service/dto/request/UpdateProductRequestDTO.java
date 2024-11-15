@@ -6,6 +6,8 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Getter
 @Setter
 public class UpdateProductRequestDTO {
@@ -14,7 +16,7 @@ public class UpdateProductRequestDTO {
     private String name;
 
     @NotNull
-    private Double price;
+    private BigDecimal price;
 
     @NotNull
     @Min(0)

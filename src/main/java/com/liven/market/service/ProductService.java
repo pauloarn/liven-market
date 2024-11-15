@@ -17,11 +17,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 @Service
 @Log4j2
-public class ProductService extends AbstractServiceRepo<ProductRepository, Product, Long> {
+public class ProductService extends AbstractServiceRepo<ProductRepository, Product, UUID> {
     public ProductService(ProductRepository repository) {
         super(repository);
     }
@@ -59,7 +60,7 @@ public class ProductService extends AbstractServiceRepo<ProductRepository, Produ
         if (productRequest.getAmount() < 0) {
             throw new ApiErrorException(HttpStatus.BAD_REQUEST, MessageEnum.AMOUNT_MUST_NOT_BE_NEGATIVE);
         }
-        if (productRequest.getPrice().compareTo(0.0) <= 0) {
+        if (productRequest.getPrice().compareTo(new BigDecimal(0)) <= 0) {
             throw new ApiErrorException(HttpStatus.BAD_REQUEST, MessageEnum.PRICE_MUST_BE_GREATER_THAN_0);
         }
         log.info("Product Validated");
@@ -75,7 +76,7 @@ public class ProductService extends AbstractServiceRepo<ProductRepository, Produ
         if (product.getAmount() < 0) {
             throw new ApiErrorException(HttpStatus.BAD_REQUEST, MessageEnum.AMOUNT_MUST_NOT_BE_NEGATIVE);
         }
-        if (product.getPrice().compareTo(0.0) <= 0) {
+        if (product.getPrice().compareTo(new BigDecimal(0)) <= 0) {
             throw new ApiErrorException(HttpStatus.BAD_REQUEST, MessageEnum.PRICE_MUST_BE_GREATER_THAN_0);
         }
 
@@ -88,6 +89,10 @@ public class ProductService extends AbstractServiceRepo<ProductRepository, Produ
             throw new ApiErrorException(HttpStatus.BAD_REQUEST, MessageEnum.PRODUCT_NOT_REGISTERED);
         }
         return new ProductDetailResponseDTO(product.get());
+    }
+
+    public Product findProduct(UUID productId) throws ApiErrorException {
+        return repository.findById(productId).orElseThrow(() -> new ApiErrorException(HttpStatus.BAD_REQUEST, MessageEnum.PRODUCT_NOT_REGISTERED));
     }
 
     public Page<ProductDetailResponseDTO> getProductList(ProductPaginateRequestDTO paginationData) {

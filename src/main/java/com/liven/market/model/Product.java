@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Getter
@@ -15,23 +16,23 @@ import java.util.UUID;
 @NoArgsConstructor
 @Entity
 @Table(name = "products", catalog = Catalog.MARKET_DATA_BASE, schema = Schema.MarketApp)
-public class Product extends BaseEntity{
+public class Product extends BaseEntity {
     @Id
     @GeneratedValue(generator = "UUID")
     @ColumnDefault("random_uuid()")
     @Column(name = "id")
     private UUID productId;
 
-
     @Column(name = "sku")
     private String sku;
 
-    @Column(name="name")
+    @Column(name = "name")
     private String name;
 
-    @Column(name="price")
-    private Double price;
+    @Column(name = "price")
+    private BigDecimal price;
 
     @Column(name = "amount")
     private Long amount;
+
 }
