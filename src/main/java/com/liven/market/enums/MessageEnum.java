@@ -20,6 +20,7 @@ public enum MessageEnum {
     PRODUCT_NOT_REGISTERED("message.api.product.not.registered"),
     BASKET_NOT_FOUND("message.api.basket.not.found"),
     BASKET_ALREADY_CLOSED("message.api.basket.already.closed"),
+    PRODUCT_AMOUNT_HIGHER_THANK_STOCK("message.api.product.amount.higher.thank.stock"),
     UNKNOWN_ERROR("message.api.error.desconhecido"),
 
     INVALID_TOKEN("message.api.invalid.token"),

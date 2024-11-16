@@ -71,6 +71,7 @@ public class BasketService extends AbstractServiceRepo<BasketRepository, Basket,
         basketCheckout.setPaymentMethod(checkoutRequest.getPaymentMethod());
         selectedBasket.setCheckout(basketCheckout);
         repository.save(selectedBasket);
+        productService.subtrackProductAmountAfterCheckout(selectedBasket);
         return new BasketResponseDTO(selectedBasket);
     }
 

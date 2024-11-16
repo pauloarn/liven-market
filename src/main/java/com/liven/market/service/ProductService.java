@@ -2,6 +2,8 @@ package com.liven.market.service;
 
 import com.liven.market.enums.MessageEnum;
 import com.liven.market.exceptions.ApiErrorException;
+import com.liven.market.model.Basket;
+import com.liven.market.model.BasketProduct;
 import com.liven.market.model.Product;
 import com.liven.market.repository.ProductRepository;
 import com.liven.market.service.dto.request.CreateProductRequestDTO;
@@ -10,6 +12,7 @@ import com.liven.market.service.dto.request.UpdateProductRequestDTO;
 import com.liven.market.service.dto.response.ProductDetailResponseDTO;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
+import jakarta.transaction.Transactional;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -25,6 +28,20 @@ import java.util.*;
 public class ProductService extends AbstractServiceRepo<ProductRepository, Product, UUID> {
     public ProductService(ProductRepository repository) {
         super(repository);
+    }
+
+    @Transactional
+    public void subtrackProductAmountAfterCheckout(Basket selectedBasket) throws ApiErrorException {
+        for (BasketProduct basketProduct : selectedBasket.getProductList()) {
+            Product currentProduct = basketProduct.getProduct();
+            Long newAmount = currentProduct.getAmount() - basketProduct.getProductAmount();
+            if (newAmount.compareTo(0L) < 0) {
+                throw new ApiErrorException(HttpStatus.BAD_REQUEST, MessageEnum.PRODUCT_AMOUNT_HIGHER_THANK_STOCK,
+                        MessageEnum.PRODUCT_AMOUNT_HIGHER_THANK_STOCK.getMessage(basketProduct.getProduct().getName()));
+            }
+            currentProduct.setAmount(newAmount);
+            repository.save(currentProduct);
+        }
     }
 
     public ProductDetailResponseDTO createProduct(CreateProductRequestDTO productRequest) throws ApiErrorException {
