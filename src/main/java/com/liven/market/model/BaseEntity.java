@@ -19,10 +19,10 @@ import java.time.LocalDateTime;
 public abstract class BaseEntity implements Serializable {
 
     @CreationTimestamp
-    @Column(name = "createdAt", nullable = false, updatable = false)
+    @Column(name = "createdat", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
-    @Column(name = "updatedAt")
+    @Column(name = "updatedat")
     private LocalDateTime updatedAt;
 }

@@ -32,6 +32,10 @@ public class Basket extends BaseEntity {
     @JoinColumn(name = "user_fk")
     private User user;
 
+
     @OneToMany(mappedBy = "basket", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<BasketProduct> productList = new ArrayList<>();
+
+    @OneToOne(mappedBy = "basket", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Checkout checkout;
 }

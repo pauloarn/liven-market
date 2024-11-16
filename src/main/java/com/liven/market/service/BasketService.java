@@ -2,13 +2,11 @@ package com.liven.market.service;
 
 import com.liven.market.enums.MessageEnum;
 import com.liven.market.exceptions.ApiErrorException;
-import com.liven.market.model.Basket;
-import com.liven.market.model.BasketProduct;
+import com.liven.market.model.*;
 import com.liven.market.model.IDs.BasketProductId;
-import com.liven.market.model.Product;
-import com.liven.market.model.User;
 import com.liven.market.repository.BasketRepository;
 import com.liven.market.service.dto.request.AddProductToBasketRequestDTO;
+import com.liven.market.service.dto.request.CheckoutBasketRequestDTO;
 import com.liven.market.service.dto.response.BasketResponseDTO;
 import jakarta.transaction.Transactional;
 import lombok.extern.log4j.Log4j2;
@@ -17,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -31,6 +30,17 @@ public class BasketService extends AbstractServiceRepo<BasketRepository, Basket,
         super(repository);
         this.productService = _productService;
         this.userService = _userService;
+    }
+
+    private Basket validateBasketCanBeEdited(UUID basketId) throws ApiErrorException {
+        List<Basket> userBaskets = getUserBasketsByLoggedUser();
+        Basket selectedBasket = userBaskets.stream().filter((b) -> b.getBasketId().equals(basketId)).findFirst().orElseThrow(
+                () -> new ApiErrorException(HttpStatus.BAD_REQUEST, MessageEnum.BASKET_NOT_FOUND)
+        );
+        if (Objects.nonNull(selectedBasket.getCheckout())) {
+            throw new ApiErrorException(HttpStatus.BAD_REQUEST, MessageEnum.BASKET_ALREADY_CLOSED);
+        }
+        return selectedBasket;
     }
 
     public BasketResponseDTO createUserBasket() {
@@ -53,6 +63,18 @@ public class BasketService extends AbstractServiceRepo<BasketRepository, Basket,
         return repository.getBasketByUserUserId(loggedUser.getUserId());
     }
 
+    @Transactional
+    public BasketResponseDTO checkoutBasket(UUID basketId, CheckoutBasketRequestDTO checkoutRequest) throws ApiErrorException {
+        Basket selectedBasket = validateBasketCanBeEdited(basketId);
+        Checkout basketCheckout = new Checkout();
+        basketCheckout.setBasket(selectedBasket);
+        basketCheckout.setPaymentMethod(checkoutRequest.getPaymentMethod());
+        selectedBasket.setCheckout(basketCheckout);
+        repository.save(selectedBasket);
+        return new BasketResponseDTO(selectedBasket);
+    }
+
+
     public BasketResponseDTO getBasketById(UUID id) throws ApiErrorException {
         List<Basket> userBaskets = this.getUserBasketsByLoggedUser();
         Basket selectedBasket = userBaskets.stream().filter((basket -> basket.getBasketId().equals(id)))
@@ -62,10 +84,7 @@ public class BasketService extends AbstractServiceRepo<BasketRepository, Basket,
 
     @Transactional
     public BasketResponseDTO addProductsToBasket(UUID basketId, List<AddProductToBasketRequestDTO> products) throws ApiErrorException {
-        List<Basket> userBaskets = this.getUserBasketsByLoggedUser();
-        Basket selectedBasket = userBaskets.stream().filter((b) -> b.getBasketId().equals(basketId)).findFirst().orElseThrow(
-                () -> new ApiErrorException(HttpStatus.BAD_REQUEST, MessageEnum.BASKET_NOT_FOUND)
-        );
+        Basket selectedBasket = validateBasketCanBeEdited(basketId);
         BigDecimal totalBasketValue = new BigDecimal(0);
         for (AddProductToBasketRequestDTO product : products) {
             Product innerProduct = productService.findProduct(product.getProductId());
