@@ -17,6 +17,7 @@ public class CreateUserRequestDTO {
     private String email;
 
     @NotNull
+    @Size(min = 2, max = 255)
     private String name;
 
     @NotNull
