@@ -6,5 +6,5 @@ CREATE TABLE MarketApp.checkouts
     createdAt      timestamp not null,
     updatedAt      timestamp not null,
 
-    CONSTRAINT BasketUserFK foreign key (basket_fk) references MarketApp.baskets (id)
+    CONSTRAINT CheckoutBasketFK foreign key (basket_fk) references MarketApp.baskets (id)
 );

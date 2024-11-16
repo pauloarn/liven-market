@@ -6,6 +6,10 @@ import com.liven.market.model.User;
 import com.liven.market.repository.UserRepository;
 import com.liven.market.service.dto.request.CreateUserRequestDTO;
 import com.liven.market.service.dto.response.UserDetailResponseDTO;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -14,6 +18,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -21,6 +26,16 @@ import java.util.UUID;
 public class UserService extends AbstractServiceRepo<UserRepository, User, UUID> {
     public UserService(UserRepository repository) {
         super(repository);
+    }
+
+    private static void validateUserCreatingDTO(CreateUserRequestDTO createUserRequest) throws ApiErrorException {
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        Validator validator = factory.getValidator();
+        Set<ConstraintViolation<CreateUserRequestDTO>> violations = validator.validate(createUserRequest);
+        if (!violations.isEmpty()) {
+            log.error("DTO de criação de usuário inválido");
+            throw new ApiErrorException(HttpStatus.BAD_REQUEST, MessageEnum.VALIDATION_ERROR);
+        }
     }
 
     public UserDetailResponseDTO getUserInfo() {
@@ -54,6 +69,7 @@ public class UserService extends AbstractServiceRepo<UserRepository, User, UUID>
     }
 
     private void validateCreateUserRequest(CreateUserRequestDTO createUserRequest) throws ApiErrorException {
+        validateUserCreatingDTO(createUserRequest);
         log.info("Verifying if email is already registered");
         Optional<User> userAux = repository.findUsersByEmail(createUserRequest.getEmail());
         if (userAux.isPresent()) {
